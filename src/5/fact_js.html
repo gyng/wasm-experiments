@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Simple template</title>
+    <script>
+      window.fact_js = (n) => {
+        if (n === 0) {
+          return 1;
+        }
+
+        return n * fact_js(n - 1);
+      }
+
+      window.count_js = (n) => {
+        const binary = n.toString(2);
+        let count = 0;
+
+        for (let i = 0; i < binary.length; i++) {
+          if (i === '1') count++;
+        }
+
+        return count;
+      }
+
+      window.count_regex_js = (n) => {
+        const binary = n.toString(2);
+        return (binary.match(/1/g) || []).length;
+      }
+    </script>
+  </head>
+  <body>
+
+<pre>
+var start = performance.now();
+
+for (let i = 0; i < 1000000; i++) {
+  fact_js(12);
+}
+
+var end = performance.now();
+console.log(end - start, 'ms');
+</pre>
+
+<hr>
+
+<pre>
+var start = performance.now();
+
+for (let i = 0; i < 1000000; i++) {
+  count_js(i);
+}
+
+var end = performance.now();
+console.log(end - start, 'ms');
+</pre>
+
+<hr>
+
+<pre>
+var start = performance.now();
+
+for (let i = 0; i < 1000000; i++) {
+  count_regex_js(i);
+}
+
+var end = performance.now();
+console.log(end - start, 'ms');
+</pre>
+  </body>
+</html>
