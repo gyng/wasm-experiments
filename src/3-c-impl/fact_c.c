@@ -2,6 +2,8 @@
 //
 // >> Module._fact_c(5)
 // <- 120
+//
+// ./wabt/wasm2wast src/3-c-impl/fact_c.wasm > src/3-c-impl/fact_c.wast
 
 /* js
 var start = performance.now();
@@ -38,3 +40,4 @@ console.log(end - start, 'ms');
 int EMSCRIPTEN_KEEPALIVE count_ones_c(int n) {
   return __builtin_popcount(n);
 }
+

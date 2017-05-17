@@ -39,3 +39,5 @@ emcc fact_c.c -s WASM=1 -O2 -o fact_c.html
 * https://hackernoon.com/compiling-rust-to-webassembly-guide-411066a69fde
 * http://www.hellorust.com/emscripten/
 * https://github.com/WebAssembly/wabt
+* https://github.com/mdn/webassembly-examples
+

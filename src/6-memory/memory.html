@@ -1,0 +1,43 @@
+<!doctype html>
+
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <title>WASM memory test</title>
+  </head>
+
+  <body>
+    <script>
+      const fetchAndInstantiate = (url, importObject) =>
+        fetch(url)
+          .then(response => response.arrayBuffer())
+          .then(bytes => WebAssembly.instantiate(bytes, importObject))
+          .then(results => results.instance);
+
+      const memory = new WebAssembly.Memory({ initial: 10, maximum: 100 });
+
+      fetchAndInstantiate('memory.wasm')
+        .then((instance) => {
+          const i32 = new Uint32Array(instance.exports.mem.buffer);
+
+          for (let i = 0; i < 10; i++) {
+            i32[i] = i;
+          }
+
+          const sum = instance.exports.accumulate(0, 10);
+
+          console.log(sum);
+        });
+    </script>
+
+<h1>Memory</h1>
+
+<p>ArrayBuffer objects holding raw bytes of memory which can be accessed and mutated by wasm</p>
+
+<pre>
+./wabt/wast2wasm src/6-memory/memory.wat -o ./src/6-memory/memory.wasm
+</pre>
+  </body>
+
+</html>

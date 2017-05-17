@@ -6,18 +6,21 @@
     <script>
       var importObject = {
         imports: {
-          imported_func: arg => console.log(arg),
-          DYNAMICTOP_PTR: 0
+          imported_func: arg => console.log(arg)
         },
-        env: {},
+        env: {}
       };
 
-      fetch('simple2.wasm')
+      fetch('simple.wasm')
         .then(res => res.arrayBuffer())
         .then(bytes => WebAssembly.instantiate(bytes, importObject))
         .then(results => results.instance.exports.exported_func());
     </script>
   </head>
   <body>
+<pre>
+./wabt/wast2wasm src/2-wasm-import-export/simple.wat -v
+./wabt/wast2wasm src/2-wasm-import-export/simple.wat -o src/2-wasm-import-export/simple.wasm
+</pre>
   </body>
 </html>

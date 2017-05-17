@@ -1,0 +1,49 @@
+<!doctype html>
+
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <title>WASM table test</title>
+  </head>
+
+  <body>
+    <script>
+      const fetchAndInstantiate = (url, importObject) =>
+        fetch(url)
+          .then(response => response.arrayBuffer())
+          .then(bytes => WebAssembly.instantiate(bytes, importObject))
+          .then(results => results.instance);
+
+      const tbl = new WebAssembly.Table({ initial: 3, element: 'anyfunc' });
+
+      console.log(tbl.length);
+      console.log(tbl.get(0));
+      console.log(tbl.get(1));
+      console.log(tbl.get(2));
+
+      const importObject = {
+        js: {
+          tbl: tbl,
+        }
+      };
+
+      fetchAndInstantiate('table.wasm', importObject)
+        .then((instance) => {
+          console.log(tbl.length);
+          console.log(tbl.get(0), tbl.get(0)());
+          console.log(tbl.get(1), tbl.get(1)(5));
+          console.log(tbl.get(2));
+        });
+    </script>
+<h1>Table</h1>
+
+<p>Vector of function pointers, accessible/mutable from both JS and wasm</p>
+<p>Can only assign wasm exported functinos to Table</p>
+
+<pre>
+./wabt/wast2wasm src/7-table/table.wat -o ./src/7-table/table.wasm
+</pre>
+  </body>
+
+</html>
