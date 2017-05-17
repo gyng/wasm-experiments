@@ -40,4 +40,4 @@ emcc fact_c.c -s WASM=1 -O2 -o fact_c.html
 * http://www.hellorust.com/emscripten/
 * https://github.com/WebAssembly/wabt
 * https://github.com/mdn/webassembly-examples
-
+* https://github.com/WebAssembly/spec/tree/master/interpreter/#s-expression-syntax

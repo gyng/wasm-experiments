@@ -40,4 +40,3 @@ console.log(end - start, 'ms');
 int EMSCRIPTEN_KEEPALIVE count_ones_c(int n) {
   return __builtin_popcount(n);
 }
-

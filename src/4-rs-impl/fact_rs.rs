@@ -30,7 +30,6 @@ pub fn fact_rs(n: i32) -> i32 {
   n.checked_mul(fact_rs(n - 1)).unwrap() // panic if overflow!
 }
 
-
 /* js
 var start = performance.now();
 

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>8 - string</title>
+    <script>
+    const fetchAndInstantiate = (url, importObject) =>
+      fetch(url)
+        .then(response => response.arrayBuffer())
+        .then(bytes => WebAssembly.instantiate(bytes, importObject))
+        .then(results => results.instance);
+
+      var importObject = {
+        imports: {
+          print_ascii: arg => console.log(String.fromCharCode(arg))
+        },
+        env: {}
+      };
+
+      const memory = new WebAssembly.Memory({ initial: 26, maximum: 100 });
+
+      fetchAndInstantiate('string.wasm', importObject)
+        .then((instance) => {
+          const i32 = new Uint32Array(instance.exports.mem.buffer);
+
+          for (let i = 0; i < 26; i++) {
+            i32[i] = i + 65;
+          }
+
+          instance.exports.print_and_lower(0, 26);
+
+          for (let i = 0; i < 26; i++) {
+            console.log(String.fromCharCode(i32[i]));
+          }
+        });
+    </script>
+  </head>
+  <body>
+
+<h1>String</h1>
+
+<p>Transfers a char array (ASCII) to wasm, access it, mutate it, and then access again from JS.</p>
+
+<pre>
+./wabt/wast2wasm src/8-string/string.wat -o ./src/8-string/string.wasm
+</pre>
+  </body>
+</html>
