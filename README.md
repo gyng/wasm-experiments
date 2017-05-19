@@ -41,3 +41,5 @@ emcc fact_c.c -s WASM=1 -O2 -o fact_c.html
 * https://github.com/WebAssembly/wabt
 * https://github.com/mdn/webassembly-examples
 * https://github.com/WebAssembly/spec/tree/master/interpreter/#s-expression-syntax
+* https://www.youtube.com/watch?v=6v4E6oksar0
+* https://www.ecma-international.org/ecma-262/5.1/
