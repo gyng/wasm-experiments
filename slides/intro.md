@@ -1,11 +1,15 @@
+<!-- $theme: default -->
+
 <!-- page_number: true -->
 
 # What is WebAssembly?
-## May 2017
+May 2017
+https://github.com/gyng/wasm-experiments
+
 
 ---
 
-# What it looks like
+# What it looks like (wasm)
 
 ```text
 0061 736d 0100 0000 0108 0260 017f 0060
@@ -17,7 +21,7 @@
 
 ---
 
-# Text format
+# Text format (was?t)
 
 ```
 (module
@@ -37,6 +41,7 @@ int main() {
   return 0;
 }
 ```
+<small>emcc hello.c -s WASM=1 -o hello.html</small>
 
 ---
 
@@ -49,7 +54,8 @@ int main() {
 - JS engine optimisations can only do so much
 
 ## Plugins are dead and unsafe
-- ActiveX, Java
+- ActiveX, Java, Flash
+- Not on mobile
 
 ---
 
@@ -157,6 +163,24 @@ pub fn fact(n: i32) -> i32 {
 
 # Module, Instance
 
+## Modules
+Stateless, compiled WASM code
+
+```js
+new WebAssembly.Module(bufferSource);
+```
+
+## Instance
+Stateful, executable instance of a module
+
+```js
+new WebAssembly.Instance(module, importObject);
+```
+
+---
+
+# Module, Instance
+
 ```javascript
 const importObject = {
   imports: {
@@ -164,10 +188,12 @@ const importObject = {
   }
 };
 
+// fetchAndInstantiate
 const wasmFunc = fetch('simple.wasm')
   .then(res =>
     res.arrayBuffer())
   .then(bytes =>
+    // Create an instance directly
     WebAssembly.instantiate(bytes, importObject))
   .then(results =>
     results.instance.exports.exported_fn());
@@ -187,7 +213,7 @@ wasmFunc() // 42
     call $i)) ;; () => console.log(42)
 ```
 
-(compiled to simple.wasm)
+<small>./wast2wasm simple.wat -o simple.wasm</small>
 
 ---
 
@@ -242,14 +268,14 @@ fetchAndInstantiate('memory.wasm')
 
 ```c
 int accumulate(int *ptr, int len) {
-  int end = ptr + len * sizeof(int);
+  int *end = ptr + len * sizeof(int);
   int sum = 0;
 
   while (ptr != end) {
     sum += *ptr;
-    ptr += sizeof(int);	
+    ptr += sizeof(int);
   }
-  
+
   return sum;
 }
 ```
@@ -280,24 +306,6 @@ Similar to memory, sharing an array of function pointers
 * ~~IE~~
 
 https://caniuse.com/#feat=wasm
-
----
-
-# Yes, we can interact with the DOM&hellip;
-
-```
-#include <emscripten.h>
-
-int main() {
-  EM_ASM(
-    const el = document.getElementById('hello');
-    el.innerText = 'Hello, world!';
-  );
-  return 0;
-}
-```
-
-&hellip;and any web API!
 
 ---
 
@@ -332,7 +340,17 @@ function add(x) {
 * asm.js or webasm
 * adds a bunch of glue code to make things *just work*
 
-```
+```text
+git clone https://github.com/juj/emsdk.git
+cd emsdk
+
+./emsdk install --build=Release sdk-incoming-64bit \
+  binaryen-master-64bit
+
+./emsdk activate --global --build=Release \
+  sdk-incoming-64bit binaryen-master-64bit
+
+source ./emsdk_env.sh
 emcc hello.c -s WASM=1 -o hello.html
 ```
 
@@ -344,7 +362,11 @@ emcc hello.c -s WASM=1 -o hello.html
 
 Utilities for working with wasm files
 
-```
+```text
+git clone --recursive https://github.com/WebAssembly/wabt
+cd wabt
+make
+
 ./wast2wasm simple.wat -o simple.wasm
 ```
 
@@ -358,8 +380,57 @@ rustup install stable
 rustup default stable
 rustup target add wasm32-unknown-emscripten
 
-rustc --target=wasm32-unknown-emscripten app.rs -O -o app.html
+rustc --target=wasm32-unknown-emscripten \
+  app.rs -O -o app.html
 ```
+
+---
+
+# Yes, we can interact with the DOM&hellip;
+
+```c
+#include <emscripten.h>
+
+int main() {
+  EM_ASM(
+    const el = document.getem_ElementById('hello');
+    el.innerText = 'Hello, world!';
+  );
+
+  return 0;
+}
+```
+<small>emcc hello.c -o hello.html</small>
+
+&hellip;and any web API (with overhead)
+
+
+---
+
+# Using Web Audio API with emscripten
+
+```c
+#include <emscripten/emscripten.h>
+int EMSCRIPTEN_KEEPALIVE main() {
+  int i = 200;
+  EM_ASM_({
+    const context = new AudioContext;
+    window.oscillator = context.createOscillator();
+    window.oscillator.frequency.value = $0;
+    window.oscillator.connect(context.destination);
+    window.oscillator.start(0);
+  }, i);
+  for (; i < 2000; i++) {
+    EM_ASM_({
+      window.oscillator.frequency.value = $0;
+    }, i);
+    emscripten_sleep(10);
+  } 
+  return 0;
+}
+```
+<small>emcc audio.c -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -o audio.html</small>
+
 
 ---
 
@@ -382,3 +453,5 @@ rustc --target=wasm32-unknown-emscripten app.rs -O -o app.html
 * https://www.youtube.com/watch?v=6v4E6oksar0
 * https://www.ecma-international.org/ecma-262/5.1/
 * https://hackernoon.com/compiling-rust-to-webassembly-guide-411066a69fde
+* https://www.slideshare.net/RReverser/rust-javascript
+* https://kripken.github.io/emscripten-site/docs/api_reference
