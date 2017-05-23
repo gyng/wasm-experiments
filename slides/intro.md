@@ -47,14 +47,15 @@ int main() {
 
 # Why WASM?
 
-## JS is slow
+## JS is slow*
 
+- [Current engines](https://www.youtube.com/watch?v=N4-Rh6fd3ic) are [pretty fast](https://blog.mozilla.org/javascript/2016/07/05/ionmonkey-evil-on-your-behalf/), but&hellip;
 - Dynamic
 - Lots of type coercion everywhere
 - JS engine optimisations can only do so much
 
 ## Plugins are dead and unsafe
-- ActiveX, Java, Flash
+- ActiveX, Java, Flash, Silverlight
 - Not on mobile
 
 ---
@@ -103,7 +104,7 @@ addl %edx, %eax
 
 Compared to JS,
 
-## WASM* is faster *sometimes*
+## WASM* can be faster *sometimes*
 
 <small>*toy examples with emscripten, see `../src`</small>
 
@@ -140,7 +141,7 @@ pub fn fact(n: i32) -> i32 {
 | Types                     | `i32`, `i64`, `f32`, `f64`                      |
 | Functions <sup>1</sup>    | Single function table, indirect calls via table |
 | Memory <sup>2</sup>       | Single linear, bounds-checked array             |
-| Operations                | Arithmetic, (+floats ceil, sqrt, floor)         |
+| Operations                | Arithmetic++, (floats: ceil, sqrt, floor)         |
 | Control flow              | `if`, `loop`, `block`, `br`, `switch`           |
 
 <small>
@@ -196,7 +197,7 @@ const wasmFunc = fetch('simple.wasm')
     // Create an instance directly
     WebAssembly.instantiate(bytes, importObject))
   .then(results =>
-    results.instance.exports.exported_fn());
+    results.instance.exports.exported_fn);
 
 wasmFunc() // 42
 ```
@@ -302,6 +303,7 @@ Similar to memory, sharing an array of function pointers
 * Firefox 52
 * Edge 15 (flag)
 * Safari technology preview
+* Node
 * ~~iOS~~
 * ~~IE~~
 
@@ -393,7 +395,7 @@ rustc --target=wasm32-unknown-emscripten \
 
 int main() {
   EM_ASM(
-    const el = document.getem_ElementById('hello');
+    const el = document.getElementById('hello');
     el.innerText = 'Hello, world!';
   );
 
@@ -402,8 +404,7 @@ int main() {
 ```
 <small>emcc hello.c -o hello.html</small>
 
-&hellip;and any web API (with overhead)
-
+&hellip;and any [Web API](https://developer.mozilla.org/en/docs/Web/API) (with overhead)
 
 ---
 
