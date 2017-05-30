@@ -21,6 +21,28 @@ https://github.com/gyng/wasm-experiments
 
 ---
 
+# What it compiles to (x86)
+
+```x86
+wasm-function[1]:
+  sub rsp, 0x18
+  cmp qword ptr [r14 + 0x28], rsp
+  jae 0x54
+ 0x00000e:
+  mov edi, 0x2a
+  ⋮
+```
+
+```text
+48 83 ec 18
+49 39 66 28
+0f 83 46 00 00 00
+bf 2a 00 00 00
+⋮
+```
+
+---
+
 # Text format (was?t)
 
 ```lisp
