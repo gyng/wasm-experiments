@@ -23,7 +23,7 @@ https://github.com/gyng/wasm-experiments
 
 # Text format (was?t)
 
-```
+```lisp
 (module
   (func $i (import "imports" "imported_fn") (param i32))
   (func (export "exported_fn")
@@ -31,11 +31,13 @@ https://github.com/gyng/wasm-experiments
     call $i))
 ```
 
+s-expressions, also used by LISP
+
 ---
 
 # Another example
 
-```
+```c
 int main() {
   printf("Hello, world!\n");
   return 0;
@@ -50,9 +52,10 @@ int main() {
 ## JS is slow*
 
 - [Current engines](https://www.youtube.com/watch?v=N4-Rh6fd3ic) are [pretty fast](https://blog.mozilla.org/javascript/2016/07/05/ionmonkey-evil-on-your-behalf/), but&hellip;
-- Dynamic
-- Lots of type coercion everywhere
-- JS engine optimisations can only do so much
+- Verbose text representation
+- Dynamic, lots of type coercion everywhere
+- Garbage collection
+- JS engine optimisations can only do so much (and take time)
 
 ## Plugins are dead and unsafe
 - ActiveX, Java, Flash, Silverlight
@@ -80,6 +83,8 @@ a + b;
 
 ---
 
+Think of what the JIT compiler has to do to optimise `+`
+
 <div style="overflow: hidden; max-height: 40vh">
   <img src="i/tostring.png" />
 </div>
@@ -90,7 +95,7 @@ a + b;
 
 # x86 assembly
 
-```
+```x86
 addl %edx, %eax
 ```
 
@@ -104,7 +109,7 @@ addl %edx, %eax
 
 Compared to JS,
 
-## WASM* can be faster *sometimes*
+## Right now, WASM can be faster *sometimes**
 
 <small>*toy examples with emscripten, see `../src`</small>
 
@@ -116,9 +121,22 @@ Compared to JS,
 
 ---
 
+# WASM compile chain
+
+|Human| <span style="color:red">C, C++, Rust</span> | <span style="color:red">TypeScript, WAT</span> |
+|-:|:-|:-|
+|⇓| *clang, gcc, rustc*| ⇓ |
+|IR | <span style="color:red">**LLVM**</span> | ⇓ |
+|⇓| *emscripten, wabt* | ⇓ |
+|Bytecode | <span style="color:red">**WASM**</span> | <span style="color:red">**WASM**</span>
+|⇓| *browsers*
+| Machine | <span style="color:red">**x86, ARM**</span> |
+
+---
+
 # Rust example
 
-```
+```rust
 #[no_mangle]
 pub fn fact(n: i32) -> i32 {
   if n == 0 {
@@ -138,11 +156,11 @@ pub fn fact(n: i32) -> i32 {
 
 |                           |                                                 |
 |---------------------------|-------------------------------------------------|
-| Types                     | `i32`, `i64`, `f32`, `f64`                      |
-| Functions <sup>1</sup>    | Single function table, indirect calls via table |
-| Memory <sup>2</sup>       | Single linear, bounds-checked array             |
-| Operations                | Arithmetic++, (floats: ceil, sqrt, floor)         |
-| Control flow              | `if`, `loop`, `block`, `br`, `switch`           |
+| Types                     | `i32` `i64` `f32` `f64`                      |
+| Functions<sup>1</sup>    | Single function table, indirect calls via table |
+| Memory<sup>2</sup>       | Single linear, bounds-checked array             |
+| Operations                | `+` `-` `*` `/` `%` `&` `<` `<<`  `==` `ceil` `abs` etc.     |
+| Control flow              | `if` `loop` `block` `br` `switch` etc.           |
 
 <small>
 1: <a href="https://webassembly.org/docs/security/">https://webassembly.org/docs/security/</a>
@@ -311,6 +329,14 @@ https://caniuse.com/#feat=wasm
 
 ---
 
+# Browser developer tools
+
+<img src='i/devtools.png' />
+
+Breakpoints, text-format source (Firefox Developer Edition)
+
+---
+
 # Tools
 
 * llvm
@@ -432,11 +458,26 @@ int EMSCRIPTEN_KEEPALIVE main() {
 ```
 <small>emcc audio.c -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -o audio.html</small>
 
+---
+
+# The future
+
+* Reduced overhead between JS⇆WASM
+* Direct DOM access
+* [SharedArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer)
+* SIMD from WASM
+* Exception handling
+* Garbage collection
+* First class WASM modules (npm for wasm?)
+* Better devtools
+
+<small>1. https://hacks.mozilla.org/2017/02/where-is-webassembly-now-and-whats-next/</small>
 
 ---
 
 # Demos and projects
 
+* http://mbebenita.github.io/WasmExplorer/
 * https://github.com/shamadee/web-dsp
 * http://webassembly.org/demo/
 * https://s3.amazonaws.com/mozilla-games/ZenGarden/EpicZenGarden.html
@@ -448,6 +489,7 @@ int EMSCRIPTEN_KEEPALIVE main() {
 # References
 
 * https://developer.mozilla.org/en-US/docs/WebAssembly/Concepts
+* https://hacks.mozilla.org/category/a-cartoon-intro-to-webassembly/
 * http://webassembly.org/docs/semantics/
 * https://webassembly.github.io/spec/
 * https://github.com/mdn/webassembly-examples
